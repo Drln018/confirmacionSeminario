@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Asistencia - Seminario</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- SDK de Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database.js"></script>
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyA...yORWnYrU",
+            authDomain: "confirmacion-d4bea.firebaseapp.com",
+            databaseURL: "https://confirmation-d4bea-default-rtdb.firebaseio.com",
+            projectId: "confirmation-d4bea",
+            storageBucket: "confirmation-d4bea.appspot.com",
+            messagingSenderId: "660084254682",
+            appId: "1:660084254682:web:e1fc5279ea4338ce1782e3",
+            measurementId: "G-B98WPRK8XV"
+        };
+
+        // Inicializa Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+    <style>
+        body {
+            background: url('/confirmacion.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+        }
+        .form-container {
+            background: rgba(0, 0, 0, 0.75);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+        }
+        .form-title {
+            font-size: 1.8rem;
+            color: #00aaff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="form-container text-center">
+            <!-- Imagen y breve descripción -->
+            <img src="/logoumg.png" alt="Seminario de Ingeniería en Sistemas 2024" class="img-fluid mb-3" style="max-width: 300px;">
+            <p class="form-title mb-3">Confirmación de Asistencia al Seminario de Ingeniería en Sistemas 2024</p>
+            <p class="mb-4">¡Bienvenido! Confirma tu asistencia completando el formulario a continuación.</p>
+            
+            <!-- Formulario de confirmación -->
+            <form id="confirmacionForm">
+                <div class="form-group">
+                    <label for="nombre">Nombre Completo</label>
+                    <input type="text" class="form-control" id="nombre" placeholder="Ingresa tu nombre completo" required>
+                </div>
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico</label>
+                    <input type="email" class="form-control" id="correo" placeholder="Ingresa tu correo electrónico" required>
+                </div>
+                <div class="form-group">
+                    <label for="asistencia">Confirmación de Asistencia</label>
+                    <select class="form-control" id="asistencia" required>
+                        <option value="">Selecciona una opción</option>
+                        <option value="Asistiré">Asistiré</option>
+                        <option value="No Asistiré">No Asistiré</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block mt-3">Confirmar Asistencia</button>
+            </form>
+            <div id="resultado" class="mt-4"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("confirmacionForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const nombre = document.getElementById("nombre").value;
+            const correo = document.getElementById("correo").value;
+            const asistencia = document.getElementById("asistencia").value;
+
+            if (nombre && correo && asistencia) {
+                // Guardar en Firebase
+                const nuevoAsistente = firebase.database().ref('asistentes').push();
+                nuevoAsistente.set({
+                    nombre: nombre,
+                    correo: correo,
+                    asistencia: asistencia
+                })
+                .then(() => {
+                    document.getElementById("resultado").innerHTML = 
+                        `<div class="alert alert-success">
+                            ¡Gracias, ${nombre}! Hemos registrado tu ${asistencia.toLowerCase()} al seminario.
+                        </div>`;
+                })
+                .catch((error) => {
+                    document.getElementById("resultado").innerHTML = 
+                        `<div class="alert alert-danger">
+                            Hubo un error al registrar tu asistencia. Inténtalo de nuevo más tarde.
+                        </div>`;
+                    console.error("Error al guardar la información:", error);
+                });
+            } else {
+                document.getElementById("resultado").innerHTML = 
+                    `<div class="alert alert-danger">
+                        Por favor, completa todos los campos.
+                    </div>`;
+            }
+        });
+    </script>
+</body>
+</html>
